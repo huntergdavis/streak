@@ -43,10 +43,10 @@
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
     .recent::after {
-      content: "\2713";
+      content: "✓";
       color: green;
       font-size: 1.2em;
-      margin-left: 0.5em;
+      margin-left: auto;
     }
     canvas {
       position: fixed;
@@ -62,11 +62,14 @@
   <button id="do-button">I did the thing</button>
   <h2>History</h2>
   <ul id="log-list"></ul>
-
   <canvas id="confetti-canvas"></canvas>
 
   <script>
-    const wordList = ["focus", "move", "meditate", "code", "journal", "hydrate", "walk", "stretch", "read", "sleep", "run", "breathe", "plan", "learn", "grow", "lift", "rest", "smile", "clean", "cook", "write", "draw", "think", "train", "create", "listen", "organize", "review", "practice", "reflect"];
+    const wordList = [
+      "focus", "move", "meditate", "code", "journal", "hydrate", "walk", "stretch", "read", "sleep",
+      "run", "breathe", "plan", "learn", "grow", "lift", "rest", "smile", "clean", "cook",
+      "write", "draw", "think", "train", "create", "listen", "organize", "review", "practice", "reflect"
+    ];
 
     function getRandomWords() {
       const a = wordList[Math.floor(Math.random() * wordList.length)];
@@ -97,19 +100,24 @@
     function renderLog(log) {
       const list = document.getElementById("log-list");
       list.innerHTML = "";
-      const now = Date.now();
-      log.slice().reverse().forEach(entry => {
+
+      const reversedLog = log.slice().reverse();
+      for (let i = 0; i < reversedLog.length; i++) {
         const li = document.createElement("li");
-        li.textContent = new Date(entry).toLocaleString();
-        if (now - entry < 24 * 60 * 60 * 1000) {
+        const time = new Date(reversedLog[i]);
+        const nextTime = i < reversedLog.length - 1 ? new Date(reversedLog[i + 1]) : null;
+        const isStreak = nextTime && (time - nextTime) <= 24 * 60 * 60 * 1000;
+
+        li.textContent = time.toLocaleString();
+        if (isStreak) {
           li.classList.add("recent");
         }
         list.appendChild(li);
-      });
+      }
     }
 
     function triggerConfetti() {
-      const duration = 2 * 1000;
+      const duration = 2000;
       const end = Date.now() + duration;
       const colors = ["#2a9d8f", "#e9c46a", "#f4a261", "#e76f51"];
 
@@ -139,7 +147,6 @@
       redirectToNewStreak();
     } else {
       document.getElementById("streak-name").textContent = streakName;
-
       let log = loadLog(streakName);
       renderLog(log);
 
