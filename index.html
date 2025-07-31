@@ -26,15 +26,15 @@
       return `${a}-${b}`;
     }
 
-    function getPathName() {
-      const path = window.location.pathname.split("/").filter(Boolean);
-      return path.length > 1 ? path[1] : null;
-    }
+    function getStreakName() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("s");
+}
 
     function redirectToNewStreak() {
-      const newStreak = getRandomWords();
-      window.location.href = `/streak/${newStreak}`;
-    }
+  const newStreak = getRandomWords();
+  window.location.href = `/streak/?s=${newStreak}`;
+}
 
     function loadLog(name) {
       const raw = localStorage.getItem(`streak-${name}`);
@@ -55,7 +55,7 @@
       });
     }
 
-    const streakName = getPathName();
+    const streakName = getStreakName();
     if (!streakName) {
       redirectToNewStreak();
     } else {
