@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Streak</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 2em; }
+    button { font-size: 1.5em; padding: 0.5em 1em; margin-top: 1em; }
+    ul { list-style: none; padding: 0; }
+    li { margin: 0.25em 0; }
+  </style>
+</head>
+<body>
+  <h1>Streak: <span id="streak-name"></span></h1>
+  <button id="do-button">I did the thing</button>
+  <h2>History</h2>
+  <ul id="log-list"></ul>
+
+  <script>
+    const wordList = ["focus", "move", "meditate", "code", "journal", "hydrate", "walk", "stretch", "read", "sleep", "run", "breathe", "plan", "learn", "grow", "lift", "rest", "smile", "clean", "cook", "write", "draw", "think", "train", "create", "listen", "organize", "review", "practice", "reflect"];
+
+    function getRandomWords() {
+      const a = wordList[Math.floor(Math.random() * wordList.length)];
+      let b;
+      do { b = wordList[Math.floor(Math.random() * wordList.length)]; } while (a === b);
+      return `${a}-${b}`;
+    }
+
+    function getPathName() {
+      const path = window.location.pathname.split("/").filter(Boolean);
+      return path.length > 1 ? path[1] : null;
+    }
+
+    function redirectToNewStreak() {
+      const newStreak = getRandomWords();
+      window.location.href = `/streak/${newStreak}`;
+    }
+
+    function loadLog(name) {
+      const raw = localStorage.getItem(`streak-${name}`);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveLog(name, log) {
+      localStorage.setItem(`streak-${name}`, JSON.stringify(log));
+    }
+
+    function renderLog(log) {
+      const list = document.getElementById("log-list");
+      list.innerHTML = "";
+      log.forEach(entry => {
+        const li = document.createElement("li");
+        li.textContent = new Date(entry).toLocaleString();
+        list.appendChild(li);
+      });
+    }
+
+    const streakName = getPathName();
+    if (!streakName) {
+      redirectToNewStreak();
+    } else {
+      document.getElementById("streak-name").textContent = streakName;
+
+      let log = loadLog(streakName);
+      renderLog(log);
+
+      document.getElementById("do-button").addEventListener("click", () => {
+        log.push(Date.now());
+        saveLog(streakName, log);
+        renderLog(log);
+      });
+    }
+  </script>
+</body>
+</html>
+
